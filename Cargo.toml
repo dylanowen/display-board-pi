@@ -1,0 +1,49 @@
+[package]
+name = "display-board-pi"
+version = "0.0.1"
+authors = ["Dylan Owen <dyltotheo@gmail.com>"]
+description = ""
+readme = "Readme.md"
+license = "MPL-2.0"
+homepage = "https://github.com/dylanowen/display-board-pi"
+repository = "https://github.com/dylanowen/display-board-pi"
+edition = "2021"
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+lto = true
+
+[features]
+default = ["max-physical"]
+max-physical = ["rppal"]
+max-simulator = ["tui", "tui-logger"]
+
+[dependencies]
+log = "0.4"
+env_logger = "0.9"
+
+# Error handling
+anyhow = "1.0"
+
+# MAX SPI communication
+rppal = { version = "0.13", optional = true }
+bitvec = "1.0"
+
+# Async
+tokio = { version = "1.17", features = ["macros", "time", "rt-multi-thread", "sync"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+
+# API calls
+#reqwest = { version = "0.11", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+
+# MAX Simulator
+tui = { version = "0.17", optional = true }
+tui-logger = { version = "0.7", optional = true }
+
+
+
