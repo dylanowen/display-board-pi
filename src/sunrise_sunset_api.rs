@@ -2,14 +2,14 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Results {
-    results: Result,
+pub struct DaylightCollection {
+    results: Daylight,
     #[serde(default = "Status::unknown_error")]
     status: Status,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Result {
+pub struct Daylight {
     sunrise: DateTime<Utc>,
     sunset: DateTime<Utc>,
     day_length: usize,

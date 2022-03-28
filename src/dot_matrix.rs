@@ -7,6 +7,14 @@ use bitvec::order::Msb0;
 use bitvec::prelude::*;
 
 use bitvec::bitarr;
+use embedded_graphics::draw_target::DrawTarget;
+use embedded_graphics::geometry::Dimensions;
+
+use embedded_graphics::pixelcolor::BinaryColor;
+use embedded_graphics::prelude::{Point, Size};
+use embedded_graphics::primitives::Rectangle;
+
+use embedded_graphics::Pixel;
 
 pub const CHAINED_SEGMENTS: usize = 4;
 
@@ -42,10 +50,10 @@ impl DotMatrix {
         let mut display_buffer =
             bitarr![u8, Msb0; 0b0; CHAINED_SEGMENTS * DISPLAY_HEIGHT * INSTRUCTION_BITS];
 
-        for y in 0..DISPLAY_HEIGHT {
+        for (y, digit) in DIGITS.iter().enumerate().take(DISPLAY_HEIGHT) {
             for x_row in 0..CHAINED_SEGMENTS {
                 display_buffer.data[((CHAINED_SEGMENTS * y) + x_row) * INSTRUCTION_BYTES] =
-                    DIGITS[y] as u8;
+                    *digit as u8;
             }
         }
 
@@ -75,28 +83,33 @@ impl DotMatrix {
         Ok(())
     }
 
-    pub fn all_on(&mut self) -> anyhow::Result<()> {
-        for y in 0..DIGITS.len() {
-            for x_row in 0..CHAINED_SEGMENTS {
-                self.set_byte(x_row, y, 0b11111111);
-            }
-            self.flush_row(y)?;
-        }
+    // pub fn all_on(&mut self) -> anyhow::Result<()> {
+    //     for y in 0..DIGITS.len() {
+    //         for x_row in 0..CHAINED_SEGMENTS {
+    //             self.set_byte(x_row, y, 0b11111111);
+    //         }
+    //         self.flush_row(y)?;
+    //     }
+    //
+    //     Ok(())
+    // }
 
-        Ok(())
-    }
-
-    pub fn get_bit(&self, x: usize, y: usize) -> bool {
-        self.display_buffer[offset(x, y)]
-    }
+    // pub fn get_bit(&self, x: usize, y: usize) -> bool {
+    //     match offset(x, y) {
+    //         Some(o) => self.display_buffer[o],
+    //         None => false,
+    //     }
+    // }
 
     pub fn set_bit(&mut self, x: usize, y: usize, value: bool) {
-        self.display_buffer.set(offset(x, y), value)
+        if let Some(o) = offset(x, y) {
+            self.display_buffer.set(o, value)
+        }
     }
 
-    pub fn get_byte(&self, x_row: usize, y: usize) -> u8 {
-        self.display_buffer.data[((y * CHAINED_SEGMENTS) + x_row) * 2 + 1]
-    }
+    // pub fn get_byte(&self, x_row: usize, y: usize) -> u8 {
+    //     self.display_buffer.data[((y * CHAINED_SEGMENTS) + x_row) * 2 + 1]
+    // }
 
     pub fn set_byte(&mut self, x_row: usize, y: usize, data: u8) {
         self.display_buffer.data[((y * CHAINED_SEGMENTS) + x_row) * 2 + 1] = data
@@ -118,6 +131,32 @@ impl DotMatrix {
     }
 }
 
+impl Dimensions for DotMatrix {
+    fn bounding_box(&self) -> Rectangle {
+        Rectangle::new(
+            Point::new(0, 0),
+            Size::new(ROW_LENGTH as u32, DISPLAY_HEIGHT as u32),
+        )
+    }
+}
+
+impl DrawTarget for DotMatrix {
+    type Color = BinaryColor;
+
+    type Error = anyhow::Error;
+
+    fn draw_iter<I>(&mut self, pixels: I) -> anyhow::Result<()>
+    where
+        I: IntoIterator<Item = Pixel<Self::Color>>,
+    {
+        for Pixel(point, color) in pixels.into_iter() {
+            self.set_bit(point.x as usize, point.y as usize, color == BinaryColor::On);
+        }
+
+        Ok(())
+    }
+}
+
 impl Drop for DotMatrix {
     fn drop(&mut self) {
         if let Err(error) = self.max.set_display_on(false) {
@@ -126,9 +165,13 @@ impl Drop for DotMatrix {
     }
 }
 
-fn offset(x: usize, y: usize) -> usize {
-    let y_offset = y * (CHAINED_SEGMENTS * INSTRUCTION_BITS);
-    let x_segments = x / DATA_BITS;
+fn offset(x: usize, y: usize) -> Option<usize> {
+    if x < CHAINED_SEGMENTS * DISPLAY_WIDTH && y < DISPLAY_HEIGHT {
+        let y_offset = y * (CHAINED_SEGMENTS * INSTRUCTION_BITS);
+        let x_segments = x / DATA_BITS;
 
-    y_offset + (x_segments * INSTRUCTION_BITS) + COMMAND_BITS + (x % DATA_BITS)
+        Some(y_offset + (x_segments * INSTRUCTION_BITS) + COMMAND_BITS + (x % DATA_BITS))
+    } else {
+        None
+    }
 }

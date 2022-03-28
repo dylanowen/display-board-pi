@@ -6,15 +6,18 @@ SHELL:=/bin/bash
 target = arm-unknown-linux-musleabihf
 binary = display-board-pi
 
+fmt:
+	cargo fmt --all
+
 fix:
 	cargo fix --allow-staged --all-targets
-
-fmt:
-	cargo fmt --all -- --check
+	cargo clippy --all-targets --fix --allow-staged
+	cargo clippy --all-targets --no-default-features --features=max-simulator --fix --allow-staged
 
 lint:
-	cargo clippy --all-targets --fix --allow-staged -- -D warnings
-	cargo clippy --all-targets --no-default-features --features=max-simulator --fix --allow-staged -- -D warnings
+	cargo fmt --all -- --check
+	cargo clippy --all-targets -- -D warnings
+	cargo clippy --all-targets --no-default-features --features=max-simulator -- -D warnings
 	-cargo audit
 
 check:
@@ -44,7 +47,7 @@ dev-release: release
 simulator:
 	cargo run --no-default-features --features=max-simulator
 
-pre-commit: fmt lint test release
+pre-commit: lint test release
 
 clean:
 	cargo clean

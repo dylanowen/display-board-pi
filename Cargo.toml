@@ -23,6 +23,7 @@ max-simulator = ["tui", "tui-logger"]
 [dependencies]
 log = "0.4"
 env_logger = "0.9"
+lazy_static = "1.4"
 
 # Error handling
 anyhow = "1.0"
@@ -30,6 +31,7 @@ anyhow = "1.0"
 # MAX SPI communication
 rppal = { version = "0.13", optional = true }
 bitvec = "1.0"
+embedded-graphics = "0.7"
 
 # Async
 tokio = { version = "1.17", features = ["macros", "time", "rt-multi-thread", "sync"] }

@@ -1,5 +1,6 @@
 use std::mem::size_of;
 
+#[allow(dead_code)]
 #[derive(Clone, Copy)]
 #[repr(u8)]
 pub enum Command {
@@ -36,6 +37,7 @@ pub const DIGITS: [Command; 8] = [
 pub type Intensity = u8;
 pub type ScanLimit = u8;
 
+#[allow(dead_code)]
 #[repr(u8)]
 pub enum DecodeMode {
     NoDecode = 0b00000000,
@@ -109,17 +111,13 @@ mod max_impl {
 
     pub(crate) struct Max7219Impl {
         spi: Spi,
-        chained_segments: usize,
     }
 
     impl Max7219Impl {
-        pub(super) fn spi0(chained_segments: usize) -> anyhow::Result<Max7219Impl> {
+        pub(super) fn spi0(_chained_segments: usize) -> anyhow::Result<Max7219Impl> {
             let channel = Spi::new(Bus::Spi0, SlaveSelect::Ss0, 10_000_000, Mode::Mode0)?;
 
-            Ok(Max7219Impl {
-                spi: channel,
-                chained_segments,
-            })
+            Ok(Max7219Impl { spi: channel })
         }
 
         pub fn write(&mut self, data: &[u8]) -> anyhow::Result<()> {
@@ -232,7 +230,7 @@ mod max_impl {
                     .style_info(Style::default().fg(Color::Cyan))
                     .output_file(false);
                 frame.render_widget(logger, vertical_layouts[1]);
-            });
+            })?;
 
             Ok(())
         }
