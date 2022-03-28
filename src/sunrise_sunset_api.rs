@@ -3,16 +3,16 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct DaylightCollection {
-    results: Daylight,
+    pub results: Daylight,
     #[serde(default = "Status::unknown_error")]
-    status: Status,
+    pub status: Status,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Daylight {
-    sunrise: DateTime<Utc>,
-    sunset: DateTime<Utc>,
-    day_length: usize,
+    pub sunrise: DateTime<Utc>,
+    pub sunset: DateTime<Utc>,
+    pub day_length: usize,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

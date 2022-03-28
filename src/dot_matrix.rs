@@ -77,7 +77,6 @@ impl DotMatrix {
             for x_row in 0..CHAINED_SEGMENTS {
                 self.set_byte(x_row, y, 0b00000000);
             }
-            self.flush_row(y)?;
         }
 
         Ok(())
