@@ -1,3 +1,4 @@
+mod daylight;
 mod dot_matrix;
 mod max7219;
 mod sunrise_sunset_api;
@@ -5,8 +6,8 @@ mod sunrise_sunset_api;
 use crate::dot_matrix::DotMatrix;
 use tokio::sync::mpsc;
 
-use crate::sunrise_sunset_api::{Daylight, DaylightCollection, Status};
-use anyhow::anyhow;
+use crate::daylight::Daylight;
+use crate::sunrise_sunset_api::DaylightResponse;
 use chrono::Utc;
 use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::geometry::Point;
@@ -30,7 +31,6 @@ lazy_static! {
 
 #[derive(Debug)]
 enum Event {
-    UpdateDaylight(Daylight),
     UpdateDisplay,
     Exit,
 }
@@ -53,43 +53,28 @@ async fn main() -> anyhow::Result<()> {
 
     spawn_sigint_listener(&tx);
     spawn_display_updater(&tx);
-    spawn_daylight_updater(&tx);
 
     let mut matrix = DotMatrix::spi0(0x0)?;
-    let mut daylight = Daylight {
-        sunrise: Utc::now(),
-        sunset: Utc::now(),
-        day_length: 1,
-    };
+    let mut daylight = Daylight::default();
     let mut show_colon = false;
 
     while let Some(event) = rx.recv().await {
         log::trace!("{event:?}");
         match event {
-            Event::UpdateDaylight(next_daylight) => {
-                daylight = next_daylight;
-            }
             Event::UpdateDisplay => {
-                let Daylight {
-                    sunrise, sunset, ..
-                } = &daylight;
+                let now = Utc::now();
+                daylight = daylight.update(now).await;
 
                 matrix.clear()?;
 
                 draw_sun(5, 7, &mut matrix)?;
 
-                let now = Utc::now();
-                let (h, m) = if now < *sunrise {
-                    draw_up_arrow(5, 3, &mut matrix)?;
-                    let until_sunrise = *sunrise - now;
-                    (until_sunrise.num_hours(), until_sunrise.num_minutes())
-                } else if now < *sunset {
-                    draw_down_arrow(5, 3, &mut matrix)?;
-                    let until_sunset = *sunset - now;
-                    (until_sunset.num_hours(), until_sunset.num_minutes())
-                } else {
-                    (0, 0)
-                };
+                match daylight {
+                    Daylight::Sunrise { .. } => draw_up_arrow(5, 3, &mut matrix)?,
+                    Daylight::Sunset { .. } => draw_down_arrow(5, 3, &mut matrix)?,
+                    Daylight::Unknown { .. } => (),
+                }
+                let (h, m) = daylight.until(now);
 
                 Text::new(
                     &format!("{h:02}"),
@@ -183,47 +168,6 @@ fn spawn_display_updater(tx: &Sender<Event>) {
             sleep(Duration::from_secs(1)).await;
         }
     });
-}
-
-fn spawn_daylight_updater(tx: &Sender<Event>) {
-    let tx = tx.clone();
-    tokio::spawn(async move {
-        loop {
-            // try 5 times to call our API with some mild backoff
-            for &backoff in &[1, 2, 3, 5, 8] {
-                match get_daylight().await {
-                    Ok(daylight) => {
-                        send_log(Event::UpdateDaylight(daylight), &tx).await;
-                        break;
-                    }
-                    Err(error) => {
-                        log::error!("Error getting daylight: {error}");
-                        sleep(Duration::from_secs(backoff)).await;
-                    }
-                }
-            }
-
-            // Update our daylight data every hour
-            sleep(Duration::from_secs(60 * 60)).await;
-        }
-    });
-}
-
-async fn get_daylight() -> anyhow::Result<Daylight> {
-    log::debug!("Querying Daylight");
-    let collection = reqwest::get(
-        "https://api.sunrise-sunset.org/json?lat=40.743722&lng=-73.978020&formatted=0",
-    )
-    .await?
-    .json::<DaylightCollection>()
-    .await?;
-
-    match collection.status {
-        Status::Ok => Ok(collection.results),
-        Status::InvalidRequest => Err(anyhow!("Invalid Request")),
-        Status::InvalidDate => Err(anyhow!("Invalid Date")),
-        Status::UnknownError => Err(anyhow!("Unknown Error")),
-    }
 }
 
 async fn send_log<T>(value: T, tx: &Sender<T>) {

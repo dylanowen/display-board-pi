@@ -18,5 +18,8 @@
 ## Setup
 1. Install [cross](https://github.com/cross-rs/cross) for compiling
 
+## Screen
+`screen -DR display`
+
 ## Sunset API Source
-(SunRise Sunset)[https://sunrise-sunset.org/]
+[SunRise Sunset](https://sunrise-sunset.org/)

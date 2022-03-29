@@ -117,6 +117,7 @@ mod max_impl {
         pub(super) fn spi0(_chained_segments: usize) -> anyhow::Result<Max7219Impl> {
             let channel = Spi::new(Bus::Spi0, SlaveSelect::Ss0, 10_000_000, Mode::Mode0)?;
 
+            log::info!("Connected to MAX7219");
             Ok(Max7219Impl { spi: channel })
         }
 
@@ -134,7 +135,6 @@ mod max_impl {
     use crate::max7219::Command;
     use bitvec::order::Msb0;
     use bitvec::BitArr;
-    use log::info;
     use std::io;
     use std::io::Stdout;
     use tui::backend::CrosstermBackend;
@@ -152,8 +152,6 @@ mod max_impl {
 
     impl Max7219Impl {
         pub(super) fn spi0(chained_segments: usize) -> anyhow::Result<Max7219Impl> {
-            info!("Running Simulator");
-
             let stdout = io::stdout();
             let backend = CrosstermBackend::new(stdout);
             let mut terminal = Terminal::new(backend)?;
@@ -162,6 +160,7 @@ mod max_impl {
             let mut panels = Vec::with_capacity(chained_segments);
             panels.resize_with(chained_segments, Panel::default);
 
+            log::info!("Connected to MAX7219 Simulator");
             Ok(Max7219Impl { terminal, panels })
         }
 
