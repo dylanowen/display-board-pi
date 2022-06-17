@@ -22,4 +22,4 @@
 `screen -DR display`
 
 ## Sunset API Source
-[SunRise Sunset](https://sunrise-sunset.org/)
+[Sunrise Sunset](https://sunrise-sunset.org/)

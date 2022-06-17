@@ -164,7 +164,7 @@ fn spawn_display_updater(tx: &Sender<Event>) {
     tokio::spawn(async move {
         loop {
             send_log(Event::UpdateDisplay, &tx).await;
-            // Update our display ever 1s
+            // Update our display every 1s
             sleep(Duration::from_secs(1)).await;
         }
     });
