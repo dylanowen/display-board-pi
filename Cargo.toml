@@ -29,7 +29,7 @@ lazy_static = "1.4"
 anyhow = "1.0"
 
 # MAX SPI communication
-rppal = { version = "0.13", optional = true }
+rppal = { version = "0.14", optional = true }
 bitvec = "1.0"
 embedded-graphics = "0.7"
 
