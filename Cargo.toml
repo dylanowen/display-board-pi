@@ -34,7 +34,7 @@ bitvec = "1.0"
 embedded-graphics = "0.7"
 
 # Async
-tokio = { version = "1.25", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
+tokio = { version = "1.26", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
 async-recursion = "1.0"
 
 # API calls
