@@ -31,7 +31,7 @@ anyhow = "1.0"
 # MAX SPI communication
 rppal = { version = "0.14", optional = true }
 bitvec = "1.0"
-embedded-graphics = "0.7"
+embedded-graphics = "0.8"
 
 # Async
 tokio = { version = "1.28", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
