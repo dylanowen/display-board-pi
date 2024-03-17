@@ -35,7 +35,7 @@ embedded-graphics = "0.7"
 
 # Async
 tokio = { version = "1.36", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
-async-recursion = "1.0"
+async-recursion = "1.1"
 
 # API calls
 reqwest = { version = "0.11", features = ["json"] }
