@@ -30,7 +30,7 @@ anyhow = "1.0"
 
 # MAX SPI communication
 rppal = { version = "0.15", optional = true }
-bitvec = "1.0"
+bitvec = "1.0.1"
 embedded-graphics = "0.7"
 
 # Async
