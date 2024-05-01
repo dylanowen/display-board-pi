@@ -42,7 +42,7 @@ reqwest = { version = "0.12", features = ["json"] }
 openssl = { version = "0.10", features = ["vendored"] } # compile openssl from source for reqwest
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 
 # MAX Simulator
 tui = { version = "0.19", optional = true }
