@@ -26,7 +26,7 @@ env_logger = "0.11"
 lazy_static = "1.4"
 
 # Error handling
-anyhow = "1.0"
+anyhow = "1.0.82"
 
 # MAX SPI communication
 rppal = { version = "0.15", optional = true }
