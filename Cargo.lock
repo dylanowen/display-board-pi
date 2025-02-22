@@ -1778,9 +1778,9 @@ dependencies = [
 
 [[package]]
 name = "tui-logger"
-version = "0.14.1"
+version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55a5249b5e5df37af5389721794f9839dad0b3f7b92445f24528199acf2f1805"
+checksum = "2f3fb54e48fa37d5081603f7804c730734b381235ebd876cb1e66f853a7d2533"
 dependencies = [
  "chrono",
  "fxhash",
@@ -1788,6 +1788,7 @@ dependencies = [
  "log",
  "parking_lot",
  "ratatui",
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -1798,9 +1799,9 @@ checksum = "5bd2fe26506023ed7b5e1e315add59d6f584c621d037f9368fea9cfb988f368c"
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.10.1"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1dd624098567895118886609431a7c3b8f516e41d30e0643f03d94592a147e36"
+checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "unicode-truncate"
