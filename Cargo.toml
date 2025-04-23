@@ -46,7 +46,7 @@ chrono = { version = "0.4.38", features = ["serde"] }
 
 # MAX Simulator
 tui = { version = "0.19", optional = true }
-tui-logger = { version = "0.17.0", optional = true }
+tui-logger = { version = "0.14.0", optional = true }
 
 
 
